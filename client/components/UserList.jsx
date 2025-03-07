@@ -13,10 +13,10 @@ export default function UserList() {
 
     useEffect(() => {
         userService.getAll()
-                .then(result => {
-                    setUsers(result);
-                })
-    }, []); 
+            .then(result => {
+                setUsers(result);
+            })
+    }, []);
 
     const createUserClickHandler = () => {
         setShowCreate(true);
@@ -26,22 +26,44 @@ export default function UserList() {
         setShowCreate(false);
     }
 
+    const saveCreateUserClickHandler = async (e) => {
+        // Stop default refresh
+        e.preventDefault();
+
+        // Get form data
+        const formData = new FormData(e.target);
+        const userData = Object.fromEntries(formData);
+
+        // Create new user on server
+        const newUser = await userService.create(userData);
+
+        // Update local state
+        setUsers(state => [...state, newUser]);
+
+        // Close modal
+        setShowCreate(false);
+    }
+ 
     return (
         <section className="card users-container">
             <Search />
 
-            {showCreate && <UserCreate onClose={closeCreateUserClickHandler} />}
+            {showCreate &&
+                <UserCreate
+                    onClose={closeCreateUserClickHandler}
+                    onSave={saveCreateUserClickHandler}
+                />}
 
             <div className="table-wrapper">
                 <div className="overlays">
 
-                {/* <!-- <div className="loading-shade"> --> */}
-                {/* <!-- Loading spinner  --> */}
-                {/* <!-- <div className="spinner"></div> --> */}
-                {/* <!--  */}
-                {/* No users added yet  --> */}
+                    {/* <!-- <div className="loading-shade"> --> */}
+                    {/* <!-- Loading spinner  --> */}
+                    {/* <!-- <div className="spinner"></div> --> */}
+                    {/* <!--  */}
+                    {/* No users added yet  --> */}
 
-                {/* <!-- <div className="table-overlap">
+                    {/* <!-- <div className="table-overlap">
               <svg
                 aria-hidden="true"
                 focusable="false"
@@ -60,9 +82,9 @@ export default function UserList() {
               <h2>There is no users yet.</h2>
             </div> --> */}
 
-                {/* <!-- No content overlap component  --> */}
+                    {/* <!-- No content overlap component  --> */}
 
-                {/* <!-- <div className="table-overlap">
+                    {/* <!-- <div className="table-overlap">
               <svg
                 aria-hidden="true"
                 focusable="false"
@@ -80,7 +102,7 @@ export default function UserList() {
               </svg>
               <h2>Failed to fetch</h2>
             </div> --> */}
-                {/* <!-- </div> --> */}
+                    {/* <!-- </div> --> */}
                 </div>
 
                 <table className="table">
@@ -139,9 +161,9 @@ export default function UserList() {
                         </tr>
                     </thead>
                     <tbody>
-                        {users.map(user => <UserListItem 
-                        key={user._id} 
-                        {...user}
+                        {users.map(user => <UserListItem
+                            key={user._id}
+                            {...user}
                         />)}
                     </tbody>
                 </table>
