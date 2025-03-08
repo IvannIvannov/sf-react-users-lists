@@ -7,11 +7,13 @@ import Search from "./Search";
 import UserListItem from "./UserListItem";
 import UserCreate from "./UserCreate";
 import UserInfo from "./UserInfo";
+import UserDelete from "./UserDelete";
 
 export default function UserList() {
     const [users, setUsers] = useState([]);
     const [showCreate, setShowCreate] = useState(false);
     const [userIdInfo, setUserIdInfo] = useState(null);
+    const [userIdDelete, setUserIdDelete] = useState(null);
 
     useEffect(() => {
         userService.getAll()
@@ -22,11 +24,11 @@ export default function UserList() {
 
     const createUserClickHandler = () => {
         setShowCreate(true);
-    }
+    };
 
     const closeCreateUserClickHandler = () => {
         setShowCreate(false);
-    }
+    };
 
     const saveCreateUserClickHandler = async (e) => {
         // Stop default refresh
@@ -48,10 +50,29 @@ export default function UserList() {
 
     const userInfoClickHandler = (userId) => {
         setUserIdInfo(userId);
-    }
+    };
 
     const userInfoCloseHandler = () => {
         setUserIdInfo(null);
+    };
+
+    const userDeleteClickHandler = (userId) => {
+        setUserIdDelete(userId);
+    };
+
+    const userDeleteCloseHandler = () => {
+        setUserIdDelete(null);
+    }
+
+    const userDeleteHandler = async () => {
+        // Delete request to server
+        await userService.delete(userIdDelete);
+
+        // Delete from local state
+        setUsers(state => state.filter(user => user._id !== userIdDelete))
+
+        // Close modal
+        setUserIdDelete(null);
     }
 
     return (
@@ -70,6 +91,13 @@ export default function UserList() {
                     onClose={userInfoCloseHandler}
                 />
             )}
+
+            {userIdDelete &&
+                <UserDelete
+                    onClose={userDeleteCloseHandler}
+                    onDelete={userDeleteHandler}
+                />
+            }
 
             <div className="table-wrapper">
                 <div className="overlays">
@@ -181,6 +209,7 @@ export default function UserList() {
                         {users.map(user => <UserListItem
                             key={user._id}
                             onInfoClick={userInfoClickHandler}
+                            onDeleteClick={userDeleteClickHandler}
                             {...user}
                         />)}
                     </tbody>

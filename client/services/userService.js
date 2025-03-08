@@ -16,46 +16,31 @@ export default {
 
         return user;
     },
-
-        //     async create(userData) {
-    //         const { country, city, street, streetNumber, ...postData } = userData;
-
-    //         postData.address = { country, city, street, streetNumber };
-    //         postData.createdAt = new Date().toISOString(),
-    //             postData.updatedAt = new Date().toISOString(),
-
-    //         const response = await fetch(baseUrl, {
-    //                 method: 'POST',
-    //                 headers: {
-    //                     'Content-Type': 'application/json',
-    //                 },
-    //                 body: JSON.stringify(postData),
-    //             });
-
-    //         const result = await response.json();
-
-    //         return result;
-    //     }
-    // }
-
     async create(userData) {
-        const { country, city, street, streetNumber, postData } = userData;
+        const { country, city, street, streetNumber, ...postData } = userData;
 
-        const newPostData = {
-            ...postData,
-            address: { country, city, street, streetNumber },
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        };
+        postData.address = { country, city, street, streetNumber };
+        postData.createdAt = new Date().toISOString();
+        postData.updatedAt = new Date().toISOString();
 
         const response = await fetch(baseUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(newPostData), 
+            body: JSON.stringify(postData),
         });
 
-        return response.json();
+        const result = await response.json();
+
+        return result;
+    },
+    async delete(userId) {
+        const response = await fetch(`${baseUrl}/${userId}`, {
+            method: 'DELETE',
+        });
+        const result = await response.json();
+
+        return result;
     }
-};
+}
